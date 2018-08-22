@@ -1,13 +1,12 @@
-
-// TrackerDlg.h : 头文件
-//
-
 #pragma once
-
+#include "Camera.h"
+#include "cameraGuide.h"
+#include "cameraSim.h"
 
 // CTrackerDlg 对话框
 class CTrackerDlg : public CDialogEx
 {
+#define WM_UPDATEDATA WM_USER+1
 // 构造
 public:
 	CTrackerDlg(CWnd* pParent = NULL);	// 标准构造函数
@@ -30,4 +29,15 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+
+	afx_msg LRESULT OnUpdateData(WPARAM wParam, LPARAM IParam);
+
+	Camera **m_camera;
+	static DWORD WINAPI _OperGuide(LPVOID lpParameter);
+	static DWORD WINAPI _ShowGuide(LPVOID lpParameter);
+	static DWORD WINAPI _OperImaging(LPVOID lpParameter);
+	static DWORD WINAPI _ShowImaging(LPVOID lpParameter);
+public:
+	afx_msg void OnBnClickedBtnGuide();
+	afx_msg void OnBnClickedBtnImaging();
 };
