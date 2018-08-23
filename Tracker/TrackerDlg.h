@@ -4,6 +4,8 @@
 #include "cameraImaging.h"
 #include "cameraSim.h"
 #include "Record.h"
+#include "com.h"
+#include "afxwin.h"
 
 // CTrackerDlg ¶Ô»°¿ò
 class CTrackerDlg : public CDialogEx
@@ -34,15 +36,32 @@ protected:
 
 	afx_msg LRESULT OnUpdateData(WPARAM wParam, LPARAM IParam);
 
+	int timeTest = 0;
+
+	void log(CString s);
+
+	com *comInst = NULL;
+	void state(byte *buf);
+	static DWORD WINAPI _SerRecv(LPVOID lpParameter);
+	static DWORD WINAPI _TrackSend(LPVOID lpParameter);
+
 	Camera **m_camera;
 	static DWORD WINAPI _OperGuide(LPVOID lpParameter);
 	static DWORD WINAPI _ShowGuide(LPVOID lpParameter);
 	static DWORD WINAPI _OperImaging(LPVOID lpParameter);
 	static DWORD WINAPI _ShowImaging(LPVOID lpParameter);
-	bool triggerGuide = false,triggerImaging = false;
+	bool triggerGuide = false,triggerImaging = false,triggerTrack = false;
 	Record *recordGuide = NULL,*recordImaging = NULL;
 public:
 	afx_msg void OnBnClickedBtnGuide();
 	afx_msg void OnBnClickedBtnImaging();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnBnClickedBtnOpen();
+	afx_msg void OnBnClickedBtnEnable();
+	afx_msg void OnBnClickedBtnDisable();
+	afx_msg void OnBnClickedBtnLock();
+	afx_msg void OnBnClickedBtnExcu();
+	CListBox m_listLog;
+	afx_msg void OnBnClickedBtnTrac();
+	afx_msg void OnClose();
 };

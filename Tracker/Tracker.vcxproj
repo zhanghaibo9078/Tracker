@@ -191,6 +191,7 @@
     <ClInclude Include="cameraGuide.h" />
     <ClInclude Include="cameraImaging.h" />
     <ClInclude Include="cameraSim.h" />
+    <ClInclude Include="com.h" />
     <ClInclude Include="Record.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -202,6 +203,7 @@
     <ClCompile Include="cameraGuide.cpp" />
     <ClCompile Include="cameraImaging.cpp" />
     <ClCompile Include="cameraSim.cpp" />
+    <ClCompile Include="com.cpp" />
     <ClCompile Include="Record.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
