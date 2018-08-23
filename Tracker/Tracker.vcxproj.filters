@@ -42,6 +42,12 @@
     <ClInclude Include="cameraSim.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="cameraImaging.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Record.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tracker.cpp">
@@ -57,6 +63,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="cameraSim.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cameraImaging.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Record.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -14,7 +14,7 @@ public:
 private:
 	CGrabResultPtr m_ptrGrabResult;
 	CInstantCamera *m_camera;
-	UCHAR *showBuf;
+	uchar *showBuf;
 	int showWidth = 0;
 };
 

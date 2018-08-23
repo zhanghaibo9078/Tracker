@@ -33,6 +33,7 @@ BEGIN_MESSAGE_MAP(CTrackerDlg, CDialogEx)
 	ON_MESSAGE(WM_UPDATEDATA, OnUpdateData)
 	ON_BN_CLICKED(IDC_BTN_GUIDE, &CTrackerDlg::OnBnClickedBtnGuide)
 	ON_BN_CLICKED(IDC_BTN_IMAGING, &CTrackerDlg::OnBnClickedBtnImaging)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 LRESULT CTrackerDlg::OnUpdateData(WPARAM wParam, LPARAM IParam)
@@ -47,7 +48,7 @@ BOOL CTrackerDlg::OnInitDialog()
 
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
-
+	
 	m_camera = new Camera*[3]{NULL};
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -105,15 +106,22 @@ DWORD WINAPI CTrackerDlg::_ShowGuide(LPVOID lpParameter)
 
 DWORD WINAPI CTrackerDlg::_OperImaging(LPVOID lpParameter)
 {
+	int i = 0;
 	while (g_pTrakerDlg->m_camera[imagingID]->isWork)
 	{
-		Sleep(1000 / g_pTrakerDlg->m_camera[imagingID]->fps);
-		g_pTrakerDlg->m_camera[imagingID]->getData();
-		//FILE *fp = fopen("1.raw", "wb+");
-		//fwrite(g_pTrakerDlg->m_camera[imagingID]->imageBuffer, 1, g_pTrakerDlg->m_camera[imagingID]->height*g_pTrakerDlg->m_camera[imagingID]->width, fp);
-		//fclose(fp);
-		g_pTrakerDlg->m_camera[imagingID]->isShow = true;
+		if (g_pTrakerDlg->triggerImaging)
+		{
+			g_pTrakerDlg->triggerImaging = false;
+			g_pTrakerDlg->m_camera[imagingID]->getData();
+			g_pTrakerDlg->m_camera[imagingID]->isShow = true;
+			g_pTrakerDlg->recordImaging->write(g_pTrakerDlg->m_camera[imagingID]->imageBuffer);
+			//i++;
+			//CString s;
+			//s.Format(_T("%d"), i);
+			//g_pTrakerDlg->SetDlgItemText(IDC_EDIT1, s);
+		}
 	}
+	g_pTrakerDlg->recordImaging->stop();
 	return 1;
 }
 
@@ -137,6 +145,8 @@ void CTrackerDlg::OnBnClickedBtnGuide()
 	{
 		CWnd *wnd = this->GetDlgItem(IDC_STATIC_GUIDE);
 		m_camera[0] = new cameraGuide(wnd->GetDC());
+		SetTimer(1, 1000 / g_pTrakerDlg->m_camera[0]->fps, 0);
+		recordGuide = new Record(m_camera[0]->type, m_camera[0]->width, m_camera[0]->height, m_camera[0]->fps);
 	}
 	CString text;
 	GetDlgItemText(IDC_BTN_GUIDE, text);
@@ -164,6 +174,9 @@ void CTrackerDlg::OnBnClickedBtnImaging()
 	{
 		CWnd *wnd = this->GetDlgItem(IDC_STATIC_IMAGING);
 		m_camera[imagingID] = new cameraSim(wnd->GetDC());
+		SetTimer(2, 1000 / g_pTrakerDlg->m_camera[imagingID]->fps, 0);
+		//SetTimer(2, 40, 0);
+		recordImaging = new Record(m_camera[imagingID]->type, m_camera[imagingID]->width, m_camera[imagingID]->height, m_camera[imagingID]->fps);
 	}
 	CString text;
 	GetDlgItemText(IDC_BTN_IMAGING, text);
@@ -183,4 +196,21 @@ void CTrackerDlg::OnBnClickedBtnImaging()
 		m_camera[imagingID]->close();
 		SetDlgItemText(IDC_BTN_IMAGING, _T("成像-启动"));
 	}
+}
+
+void CTrackerDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	switch (nIDEvent)
+	{
+	case 1:
+		triggerGuide = true;
+		break;
+	case 2:
+		triggerImaging = true;
+		break;
+	default:
+		break;
+	}
+
+	CDialogEx::OnTimer(nIDEvent);
 }

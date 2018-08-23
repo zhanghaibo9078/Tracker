@@ -1,7 +1,9 @@
 #pragma once
 #include "Camera.h"
 #include "cameraGuide.h"
+#include "cameraImaging.h"
 #include "cameraSim.h"
+#include "Record.h"
 
 // CTrackerDlg ¶Ô»°¿ò
 class CTrackerDlg : public CDialogEx
@@ -37,7 +39,10 @@ protected:
 	static DWORD WINAPI _ShowGuide(LPVOID lpParameter);
 	static DWORD WINAPI _OperImaging(LPVOID lpParameter);
 	static DWORD WINAPI _ShowImaging(LPVOID lpParameter);
+	bool triggerGuide = false,triggerImaging = false;
+	Record *recordGuide = NULL,*recordImaging = NULL;
 public:
 	afx_msg void OnBnClickedBtnGuide();
 	afx_msg void OnBnClickedBtnImaging();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

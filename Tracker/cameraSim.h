@@ -12,7 +12,7 @@ public:
 	virtual bool getData();
 	virtual void show();
 private:
-	UCHAR *showBuf;
+	uchar *showBuf;
 	cv::Mat spaceStation;
 	int timestamp = 0;
 };

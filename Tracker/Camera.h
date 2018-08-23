@@ -4,6 +4,13 @@
 #include<opencv2/opencv.hpp>
 #include<opencv2/core.hpp>
 
+#include <clser.h>
+#include <os_type.h>
+#include <fgrab_struct.h>
+#include <fgrab_prototyp.h>
+#include <fgrab_define.h>
+#include <SisoDisplay.h>
+
 using namespace Pylon;
 
 class Camera
@@ -23,7 +30,7 @@ public:
 	bool isWork = false;
 	bool isShow = false;
 
-	UCHAR *imageBuffer;
+	uchar *imageBuffer;
 	int width = 0;
 	int height = 0;
 	int fps = 0;

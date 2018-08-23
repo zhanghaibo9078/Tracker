@@ -11,8 +11,8 @@ cameraGuide::cameraGuide(CDC *p)
 	width = 2330;
 	showWidth = 2328;
 	height = 1750;
-	imageBuffer = new UCHAR[width*height];
-	showBuf = new UCHAR[showWidth * height * 3];
+	imageBuffer = new uchar[width*height];
+	showBuf = new uchar[showWidth * height * 3];
 	fps = 26;
 	type = 'G';
 	pBmp = (BITMAPINFO*)(new char[sizeof(BITMAPINFOHEADER)]);
@@ -69,7 +69,7 @@ bool cameraGuide::getData()
 		m_camera->RetrieveResult(5000, m_ptrGrabResult);
 		if (m_ptrGrabResult->GrabSucceeded())
 		{
-			imageBuffer = (UCHAR *)m_ptrGrabResult->GetBuffer();
+			imageBuffer = (uchar *)m_ptrGrabResult->GetBuffer();
 		}
 		return true;
 	}

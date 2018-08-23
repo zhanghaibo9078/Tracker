@@ -10,8 +10,8 @@ cameraSim::cameraSim(CDC *p)
 	isShow = false;
 	width = 2328;
 	height = 1750;
-	imageBuffer = new UCHAR[width*height];
-	showBuf = new UCHAR[width * height * 3];
+	imageBuffer = new uchar[width*height];
+	showBuf = new uchar[width * height * 3];
 	fps = 26;
 	type = 'S';
 	pBmp = (BITMAPINFO*)(new char[sizeof(BITMAPINFOHEADER)]);
@@ -68,9 +68,9 @@ void cameraSim::show()
 	for (int i = 0; i < height; i++)
 		for (int j = 0; j<width; j++)
 		{
-			showBuf[i*width * 3 + j * 3 + 0] = imageBuffer[i*width + j + 1];
-			showBuf[i*width * 3 + j * 3 + 1] = imageBuffer[i*width + j + 1];
-			showBuf[i*width * 3 + j * 3 + 2] = imageBuffer[i*width + j + 1];
+			showBuf[i*width * 3 + j * 3 + 0] = imageBuffer[i*width + j];
+			showBuf[i*width * 3 + j * 3 + 1] = imageBuffer[i*width + j];
+			showBuf[i*width * 3 + j * 3 + 2] = imageBuffer[i*width + j];
 		}
 	StretchDIBits(pDC->m_hDC, 0, 0, width*0.25, -height*0.25, 0, 0, width, height, showBuf, pBmp, DIB_RGB_COLORS, SRCCOPY);
 }
