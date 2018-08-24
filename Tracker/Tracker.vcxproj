@@ -119,7 +119,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>opencv_world330d.lib;opencv_world330.lib;siso_auxport.lib;display_lib.lib;fglib5.lib;gbelib.lib;iolibrt.lib;siso_genicam.lib;siso_log.lib;</AdditionalDependencies>
+      <AdditionalDependencies>opencv_world330d.lib;siso_auxport.lib;display_lib.lib;fglib5.lib;gbelib.lib;iolibrt.lib;siso_genicam.lib;siso_log.lib;</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -170,7 +170,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opencv_world330d.lib;opencv_world330.lib;siso_auxport.lib;display_lib.lib;fglib5.lib;gbelib.lib;iolibrt.lib;siso_genicam.lib;siso_log.lib;</AdditionalDependencies>
+      <AdditionalDependencies>opencv_world330.lib;siso_auxport.lib;display_lib.lib;fglib5.lib;gbelib.lib;iolibrt.lib;siso_genicam.lib;siso_log.lib;</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -195,6 +195,7 @@
     <ClInclude Include="Record.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetTrack.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Tracker.h" />
     <ClInclude Include="TrackerDlg.h" />
@@ -211,6 +212,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="targetTrack.cpp" />
     <ClCompile Include="Tracker.cpp" />
     <ClCompile Include="TrackerDlg.cpp" />
   </ItemGroup>

@@ -6,6 +6,7 @@ public:
 	cameraGuide();
 	cameraGuide(CDC *p);
 	~cameraGuide();
+	byte *trackBuffer;
 
 	virtual bool open();
 	virtual bool close();

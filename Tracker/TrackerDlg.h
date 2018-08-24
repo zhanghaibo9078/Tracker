@@ -5,6 +5,7 @@
 #include "cameraSim.h"
 #include "Record.h"
 #include "com.h"
+#include "targetTrack.h"
 #include "afxwin.h"
 
 // CTrackerDlg ¶Ô»°¿ò
@@ -37,8 +38,13 @@ protected:
 	afx_msg LRESULT OnUpdateData(WPARAM wParam, LPARAM IParam);
 
 	int timeTest = 0;
+	targetTrack targetTracker;
 
 	void log(CString s);
+	static DWORD WINAPI _MyTimer(LPVOID lpParameter);
+	DWORD timeS[3] = { 0 }, timeE[3] = { 0 };
+	int period[3] = { 1000 };
+	bool isStart = true;
 
 	com *comInst = NULL;
 	void state(byte *buf);

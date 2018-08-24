@@ -51,6 +51,9 @@
     <ClInclude Include="com.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="targetTrack.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tracker.cpp">
@@ -75,6 +78,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="com.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="targetTrack.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

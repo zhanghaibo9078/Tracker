@@ -61,6 +61,10 @@ BOOL CTrackerDlg::OnInitDialog()
 	CComboBox *cbb = (CComboBox*)(GetDlgItem(IDC_CMB_SER));
 	cbb->SetCurSel(0);
 	m_camera = new Camera*[3]{NULL};
+	CreateThread(NULL, 0, _MyTimer, NULL, 0, NULL);
+	period[2] = 20;
+	//SetTimer(3, 15, 0);
+	//g_pTrakerDlg->targetTracker.track(g_pTrakerDlg->m_camera[0]);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -92,6 +96,7 @@ HCURSOR CTrackerDlg::OnQueryDragIcon()
 
 DWORD WINAPI CTrackerDlg::_OperGuide(LPVOID lpParameter)
 {
+	g_pTrakerDlg->timeTest = 0;
 	while (g_pTrakerDlg->m_camera[0]->isWork)
 	{
 		if (g_pTrakerDlg->triggerGuide)
@@ -99,10 +104,19 @@ DWORD WINAPI CTrackerDlg::_OperGuide(LPVOID lpParameter)
 			g_pTrakerDlg->triggerGuide = false;
 			g_pTrakerDlg->m_camera[0]->getData();
 			g_pTrakerDlg->m_camera[0]->isShow = true;
-			g_pTrakerDlg->recordGuide->write(g_pTrakerDlg->m_camera[imagingID]->imageBuffer);
+			g_pTrakerDlg->recordGuide->write(g_pTrakerDlg->m_camera[0]->imageBuffer);
+			g_pTrakerDlg->targetTracker.track(g_pTrakerDlg->m_camera[0],&oriePosi,&pitcPosi);
+			CString s;
+			s.Format(_T("%.4f"), oriePosi);
+			g_pTrakerDlg->SetDlgItemText(IDC_MANUAL_ORIE, s);
+			s.Format(_T("%.4f"), pitcPosi);
+			g_pTrakerDlg->SetDlgItemText(IDC_MANUAL_PITC, s);
 		}
 	}
 	g_pTrakerDlg->recordGuide->stop();
+	CString s;
+	s.Format(_T("Test:%d"), g_pTrakerDlg->timeTest);
+	g_pTrakerDlg->log(s);
 	return 1;
 }
 
@@ -129,16 +143,19 @@ DWORD WINAPI CTrackerDlg::_OperImaging(LPVOID lpParameter)
 		if (g_pTrakerDlg->triggerImaging)
 		{
 			g_pTrakerDlg->triggerImaging = false;
-			g_pTrakerDlg->m_camera[imagingID]->getData();
-			g_pTrakerDlg->m_camera[imagingID]->isShow = true;
-			g_pTrakerDlg->recordImaging->write(g_pTrakerDlg->m_camera[imagingID]->imageBuffer);
-			//i++;
+			if (g_pTrakerDlg->m_camera[imagingID]->getData())
+			{
+				//g_pTrakerDlg->targetTracker.track(g_pTrakerDlg->m_camera[imagingID]);
+				g_pTrakerDlg->m_camera[imagingID]->isShow = true;
+				g_pTrakerDlg->recordImaging->write(g_pTrakerDlg->m_camera[imagingID]->imageBuffer);
+				//i++;
+			}
 		}
 	}
 	g_pTrakerDlg->recordImaging->stop();
-	CString s;
-	s.Format(_T("Test:%d"), g_pTrakerDlg->timeTest);
-	g_pTrakerDlg->log(s);
+	//CString s;
+	//s.Format(_T("Test:%d"), g_pTrakerDlg->timeTest);
+	//g_pTrakerDlg->log(s);
 	return 1;
 }
 
@@ -163,7 +180,7 @@ void CTrackerDlg::OnBnClickedBtnGuide()
 		CWnd *wnd = this->GetDlgItem(IDC_STATIC_GUIDE);
 		m_camera[0] = new cameraGuide(wnd->GetDC());
 		//SetTimer(1, 700 / g_pTrakerDlg->m_camera[0]->fps, 0);
-		SetTimer(2, 20, 0);
+		period[0] = 1000 / g_pTrakerDlg->m_camera[0]->fps;
 		recordGuide = new Record(m_camera[0]->type, m_camera[0]->width, m_camera[0]->height, m_camera[0]->fps);
 	}
 	CString text;
@@ -195,9 +212,10 @@ void CTrackerDlg::OnBnClickedBtnImaging()
 	if (m_camera[imagingID] == NULL)
 	{
 		CWnd *wnd = this->GetDlgItem(IDC_STATIC_IMAGING);
-		m_camera[imagingID] = new cameraSim(wnd->GetDC());
+		//m_camera[imagingID] = new cameraSim(wnd->GetDC());
+		m_camera[imagingID] = new cameraImaging(wnd->GetDC());
 		//SetTimer(2, 700 / g_pTrakerDlg->m_camera[imagingID]->fps, 0);
-		SetTimer(2, 20, 0);
+		period[1] = 1000 / g_pTrakerDlg->m_camera[imagingID]->fps;
 		recordImaging = new Record(m_camera[imagingID]->type, m_camera[imagingID]->width, m_camera[imagingID]->height, m_camera[imagingID]->fps);
 	}
 	CString text;
@@ -222,6 +240,33 @@ void CTrackerDlg::OnBnClickedBtnImaging()
 		SetDlgItemText(IDC_BTN_IMAGING, _T("成像-启动"));
 		log(_T("成像相机断开"));
 	}
+}
+
+DWORD WINAPI CTrackerDlg::_MyTimer(LPVOID lpParameter)
+{
+	while (g_pTrakerDlg->isStart)
+	{
+		g_pTrakerDlg->timeE[0] = GetTickCount();
+		if(g_pTrakerDlg->timeE[0]-g_pTrakerDlg->timeS[0]>=g_pTrakerDlg->period[0])
+		{
+			g_pTrakerDlg->triggerGuide = true;
+			g_pTrakerDlg->timeS[0] = g_pTrakerDlg->timeE[0];
+			g_pTrakerDlg->timeTest++;
+		}
+		g_pTrakerDlg->timeE[1] = GetTickCount();
+		if(g_pTrakerDlg->timeE[1]-g_pTrakerDlg->timeS[1]>=g_pTrakerDlg->period[1])
+		{
+			g_pTrakerDlg->triggerImaging = true;
+			g_pTrakerDlg->timeS[1] = g_pTrakerDlg->timeE[1];
+		}
+		g_pTrakerDlg->timeE[2] = GetTickCount();
+		if(g_pTrakerDlg->timeE[2]-g_pTrakerDlg->timeS[2]>=g_pTrakerDlg->period[2])
+		{
+			g_pTrakerDlg->triggerTrack = true;
+			g_pTrakerDlg->timeS[2] = g_pTrakerDlg->timeE[2];
+		}
+	}
+	return 1;
 }
 
 void CTrackerDlg::OnTimer(UINT_PTR nIDEvent)
@@ -334,7 +379,6 @@ void CTrackerDlg::OnBnClickedBtnOpen()
 		if (comInst->isWork)
 		{
 			CreateThread(NULL, 0, _SerRecv, NULL, 0, NULL);
-			SetTimer(3, 15,0);
 			SetDlgItemText(IDC_BTN_OPEN, _T("断开"));
 			GetDlgItem(IDC_BTN_ENABLE)->EnableWindow(1);
 			GetDlgItem(IDC_BTN_DISABLE)->EnableWindow(1);
@@ -352,6 +396,7 @@ void CTrackerDlg::OnBnClickedBtnOpen()
 	{
 		comInst->close();
 		SetDlgItemText(IDC_BTN_OPEN, _T("连接"));
+		SetDlgItemText(IDC_BTN_TRAC, _T("跟踪"));
 		GetDlgItem(IDC_BTN_ENABLE)->EnableWindow(0);
 		GetDlgItem(IDC_BTN_DISABLE)->EnableWindow(0);
 		GetDlgItem(IDC_BTN_LOCK)->EnableWindow(0);
@@ -493,6 +538,7 @@ void CTrackerDlg::log(CString s)
 
 void CTrackerDlg::OnClose()
 {
+	isStart = false;
 	if(comInst!=NULL)
 		if(comInst->isWork)
 			comInst->close();

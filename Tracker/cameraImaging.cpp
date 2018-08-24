@@ -112,6 +112,8 @@ bool cameraImaging::getData()
 		if (!m_isOpen)
 			open();
 		imageBuffer = (uchar*)Fg_getImagePtrEx(fg, Fg_getLastPicNumberEx(fg, 0, pMem0), 0, pMem0);
+		if (imageBuffer == NULL)
+			return false;
 		return true;
 	}
 	catch (int e)
@@ -128,5 +130,5 @@ void cameraImaging::show()
 			showBuf[i*width * 3 + j * 3 + 1] = imageBuffer[i*width + j];
 			showBuf[i*width * 3 + j * 3 + 2] = imageBuffer[i*width + j];
 		}
-	StretchDIBits(pDC->m_hDC, 0, 0, width*0.2, height*0.2, 0, 0, width, height, showBuf, pBmp, DIB_RGB_COLORS, SRCCOPY);
+	StretchDIBits(pDC->m_hDC, 0, 16, width*0.13, -height*0.13, 0, 0, width, height, showBuf, pBmp, DIB_RGB_COLORS, SRCCOPY);
 }

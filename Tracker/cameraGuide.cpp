@@ -13,6 +13,7 @@ cameraGuide::cameraGuide(CDC *p)
 	height = 1750;
 	imageBuffer = new uchar[width*height];
 	showBuf = new uchar[showWidth * height * 3];
+	trackBuffer = new byte[showWidth * height];
 	fps = 26;
 	type = 'G';
 	pBmp = (BITMAPINFO*)(new char[sizeof(BITMAPINFOHEADER)]);
@@ -70,6 +71,8 @@ bool cameraGuide::getData()
 		if (m_ptrGrabResult->GrabSucceeded())
 		{
 			imageBuffer = (uchar *)m_ptrGrabResult->GetBuffer();
+			for (int i = 0; i < height; i++)
+				memcpy(trackBuffer + i * showWidth, imageBuffer + i * width + 1, showWidth);
 		}
 		return true;
 	}
@@ -87,5 +90,5 @@ void cameraGuide::show()
 			showBuf[i*showWidth * 3 + j * 3 + 1] = imageBuffer[i*width + j + 1];
 			showBuf[i*showWidth * 3 + j * 3 + 2] = imageBuffer[i*width + j + 1];
 		}
-	StretchDIBits(pDC->m_hDC, 0, 0, showWidth*0.2, height*0.2, 0, 0, showWidth, height, showBuf, pBmp, DIB_RGB_COLORS, SRCCOPY);
+	StretchDIBits(pDC->m_hDC, 0, 16, showWidth*0.225, -height*0.225, 0, 0, showWidth, height, showBuf, pBmp, DIB_RGB_COLORS, SRCCOPY);
 }
