@@ -35,5 +35,7 @@ public:
 	int height = 0;
 	int fps = 0;
 	char type = 0;
+
+	float centerX = 0, centerY = 0;
 };
 

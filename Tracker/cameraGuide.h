@@ -6,7 +6,7 @@ public:
 	cameraGuide();
 	cameraGuide(CDC *p);
 	~cameraGuide();
-	byte *trackBuffer;
+	byte *capBuffer;
 
 	virtual bool open();
 	virtual bool close();
@@ -16,6 +16,5 @@ private:
 	CGrabResultPtr m_ptrGrabResult;
 	CInstantCamera *m_camera;
 	uchar *showBuf;
-	int showWidth = 0;
 };
 

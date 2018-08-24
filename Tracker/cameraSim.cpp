@@ -8,8 +8,8 @@ cameraSim::cameraSim(CDC *p)
 	m_isOpen = false;
 	isWork = false;
 	isShow = false;
-	width = 4096;
-	height = 3072;
+	width = 2328;
+	height = 1750;
 	imageBuffer = new uchar[width*height];
 	showBuf = new uchar[width * height * 3];
 	fps = 13;
@@ -72,5 +72,43 @@ void cameraSim::show()
 			showBuf[i*width * 3 + j * 3 + 1] = imageBuffer[i*width + j];
 			showBuf[i*width * 3 + j * 3 + 2] = imageBuffer[i*width + j];
 		}
-	StretchDIBits(pDC->m_hDC, 0, 0, width*0.13, -height*0.13, 0, 0, width, height, showBuf, pBmp, DIB_RGB_COLORS, SRCCOPY);
+	int margin = 50;
+	int paintX = centerX, paintY = centerY;
+	if (paintX > 0 && paintX < width && paintY>0 && paintY < height)
+	{
+		for (int bord = 0; bord < 10; bord++)
+		{
+			for (int i = paintY - margin; i < paintY + margin; i++)
+			{
+				if (paintX - margin > 0 && paintX - margin < width && i>0 && i < height)
+				{
+					showBuf[i*width * 3 + (paintX - margin + bord) * 3 + 0] = 0;
+					showBuf[i*width * 3 + (paintX - margin + bord) * 3 + 1] = 0;
+					showBuf[i*width * 3 + (paintX - margin + bord) * 3 + 2] = 255;
+				}
+				if (paintX + margin > 0 && paintX + margin < width && i>0 && i < height)
+				{
+					showBuf[i*width * 3 + (paintX + margin - bord) * 3 + 0] = 0;
+					showBuf[i*width * 3 + (paintX + margin - bord) * 3 + 1] = 0;
+					showBuf[i*width * 3 + (paintX + margin - bord) * 3 + 2] = 255;
+				}
+			}
+			for (int i = paintX - margin; i < paintX + margin; i++)
+			{
+				if (i > 0 && i < width && paintY - margin>0 && paintY - margin < height)
+				{
+					showBuf[(paintY - margin + bord)*width * 3 + i * 3 + 0] = 0;
+					showBuf[(paintY - margin + bord)*width * 3 + i * 3 + 1] = 0;
+					showBuf[(paintY - margin + bord)*width * 3 + i * 3 + 2] = 255;
+				}
+				if (i > 0 && i < width && paintY + margin>0 && paintY + margin < height)
+				{
+					showBuf[(paintY + margin - bord)*width * 3 + i * 3 + 0] = 0;
+					showBuf[(paintY + margin - bord)*width * 3 + i * 3 + 1] = 0;
+					showBuf[(paintY + margin - bord)*width * 3 + i * 3 + 2] = 255;
+				}
+			}
+		}
+	}
+	StretchDIBits(pDC->m_hDC, 0, 0, width*0.225, -height*0.225, 0, 0, width, height, showBuf, pBmp, DIB_RGB_COLORS, SRCCOPY);
 }

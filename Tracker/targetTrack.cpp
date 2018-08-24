@@ -31,8 +31,20 @@ void targetTrack::track(Camera *cam,float *cenX,float *cenY)
 				cntX += value;
 			}
 		}
-	*cenX = x * 1.0 / cntX;
-	*cenY = y * 1.0 / cntX;
+	if (cntX < 1)
+	{
+		cam->centerX = 0;
+		cam->centerY = 0;
+		*cenX = 0;
+		*cenY = 0;
+	}
+	else
+	{
+		cam->centerX = x * 1.0 / cntX;
+		cam->centerY = y * 1.0 / cntX;
+		*cenX = cam->centerX - (cam->width-1)/2;
+		*cenY = (cam->height-1)/2 - cam->centerY;
+	}
 	//for (row = 0; row<cam->height; row++)
 	//	for (col = 0; col < cam->width; col++)
 	//	{

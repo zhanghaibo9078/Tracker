@@ -65,7 +65,7 @@ BOOL CTrackerDlg::OnInitDialog()
 	period[2] = 20;
 	//SetTimer(3, 15, 0);
 	//g_pTrakerDlg->targetTracker.track(g_pTrakerDlg->m_camera[0]);
-
+	m_listLog.SetHorizontalExtent(800);
 	return TRUE;  // ³ý·Ç½«½¹µãÉèÖÃµ½¿Ø¼þ£¬·ñÔò·µ»Ø TRUE
 }
 
@@ -104,13 +104,13 @@ DWORD WINAPI CTrackerDlg::_OperGuide(LPVOID lpParameter)
 			g_pTrakerDlg->triggerGuide = false;
 			g_pTrakerDlg->m_camera[0]->getData();
 			g_pTrakerDlg->m_camera[0]->isShow = true;
-			g_pTrakerDlg->recordGuide->write(g_pTrakerDlg->m_camera[0]->imageBuffer);
 			g_pTrakerDlg->targetTracker.track(g_pTrakerDlg->m_camera[0],&oriePosi,&pitcPosi);
-			CString s;
-			s.Format(_T("%.4f"), oriePosi);
-			g_pTrakerDlg->SetDlgItemText(IDC_MANUAL_ORIE, s);
-			s.Format(_T("%.4f"), pitcPosi);
-			g_pTrakerDlg->SetDlgItemText(IDC_MANUAL_PITC, s);
+			g_pTrakerDlg->recordGuide->write(g_pTrakerDlg->m_camera[0]->imageBuffer);
+			//CString s;
+			//s.Format(_T("%.4f"), oriePosi);
+			//g_pTrakerDlg->SetDlgItemText(IDC_MANUAL_ORIE, s);
+			//s.Format(_T("%.4f"), pitcPosi);
+			//g_pTrakerDlg->SetDlgItemText(IDC_MANUAL_PITC, s);
 		}
 	}
 	g_pTrakerDlg->recordGuide->stop();
@@ -145,10 +145,9 @@ DWORD WINAPI CTrackerDlg::_OperImaging(LPVOID lpParameter)
 			g_pTrakerDlg->triggerImaging = false;
 			if (g_pTrakerDlg->m_camera[imagingID]->getData())
 			{
-				//g_pTrakerDlg->targetTracker.track(g_pTrakerDlg->m_camera[imagingID]);
+				g_pTrakerDlg->targetTracker.track(g_pTrakerDlg->m_camera[imagingID], &oriePosi, &pitcPosi);
 				g_pTrakerDlg->m_camera[imagingID]->isShow = true;
 				g_pTrakerDlg->recordImaging->write(g_pTrakerDlg->m_camera[imagingID]->imageBuffer);
-				//i++;
 			}
 		}
 	}
@@ -179,7 +178,6 @@ void CTrackerDlg::OnBnClickedBtnGuide()
 	{
 		CWnd *wnd = this->GetDlgItem(IDC_STATIC_GUIDE);
 		m_camera[0] = new cameraGuide(wnd->GetDC());
-		//SetTimer(1, 700 / g_pTrakerDlg->m_camera[0]->fps, 0);
 		period[0] = 1000 / g_pTrakerDlg->m_camera[0]->fps;
 		recordGuide = new Record(m_camera[0]->type, m_camera[0]->width, m_camera[0]->height, m_camera[0]->fps);
 	}
@@ -214,7 +212,6 @@ void CTrackerDlg::OnBnClickedBtnImaging()
 		CWnd *wnd = this->GetDlgItem(IDC_STATIC_IMAGING);
 		//m_camera[imagingID] = new cameraSim(wnd->GetDC());
 		m_camera[imagingID] = new cameraImaging(wnd->GetDC());
-		//SetTimer(2, 700 / g_pTrakerDlg->m_camera[imagingID]->fps, 0);
 		period[1] = 1000 / g_pTrakerDlg->m_camera[imagingID]->fps;
 		recordImaging = new Record(m_camera[imagingID]->type, m_camera[imagingID]->width, m_camera[imagingID]->height, m_camera[imagingID]->fps);
 	}
@@ -345,8 +342,8 @@ DWORD WINAPI CTrackerDlg::_TrackSend(LPVOID lpParameter)
 		if (g_pTrakerDlg->triggerTrack)// && g_pTrakerDlg->comInst->isTrack)
 		{
 			g_pTrakerDlg->triggerTrack = false;
-			ori = round(oriePosi / 360 * 32767);
-			pit = round(pitcPosi / 360 * 32767);
+			ori = round(oriePosi * 10);
+			pit = round(pitcPosi * 10);
 			buf[0] = 0x55; buf[1] = 0xAA; buf[2] = 0x01; buf[3] = 0x02; buf[38] = 0xF0;
 			buf[4] = 0x06;
 			buf[29] = (uchar)(ori / 256);
@@ -471,12 +468,20 @@ void CTrackerDlg::OnBnClickedBtnTrac()
 		comInst->isTrack = true;
 		CreateThread(NULL, 0, _TrackSend, NULL, 0, NULL);
 		SetDlgItemText(IDC_BTN_TRAC, _T("Í£Ö¹"));
+		GetDlgItem(IDC_BTN_ENABLE)->EnableWindow(0);
+		GetDlgItem(IDC_BTN_DISABLE)->EnableWindow(0);
+		GetDlgItem(IDC_BTN_LOCK)->EnableWindow(0);
+		GetDlgItem(IDC_BTN_EXCU)->EnableWindow(0);
 	}
 	else
 	{
 		comInst->isTrack = false;
 		SetDlgItemText(IDC_BTN_TRAC, _T("¸ú×Ù"));
 		log(_T("Í£Ö¹¸ú×Ù"));
+		GetDlgItem(IDC_BTN_ENABLE)->EnableWindow(1);
+		GetDlgItem(IDC_BTN_DISABLE)->EnableWindow(1);
+		GetDlgItem(IDC_BTN_LOCK)->EnableWindow(1);
+		GetDlgItem(IDC_BTN_EXCU)->EnableWindow(1);
 	}
 }
 

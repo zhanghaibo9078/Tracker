@@ -8,22 +8,21 @@ cameraGuide::cameraGuide(CDC *p)
 	m_isOpen = false;
 	isWork = false;
 	isShow = false;
-	width = 2330;
-	showWidth = 2328;
+	width = 2328;
 	height = 1750;
 	imageBuffer = new uchar[width*height];
-	showBuf = new uchar[showWidth * height * 3];
-	trackBuffer = new byte[showWidth * height];
+	showBuf = new uchar[width * height * 3];
+	capBuffer = new byte[(width+2) * height];
 	fps = 26;
 	type = 'G';
 	pBmp = (BITMAPINFO*)(new char[sizeof(BITMAPINFOHEADER)]);
 	pBmp->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	pBmp->bmiHeader.biWidth = showWidth;
+	pBmp->bmiHeader.biWidth = width;
 	pBmp->bmiHeader.biHeight = height;
 	pBmp->bmiHeader.biPlanes = 1;
 	pBmp->bmiHeader.biBitCount = 24;
 	pBmp->bmiHeader.biCompression = BI_RGB;
-	pBmp->bmiHeader.biSizeImage = showWidth * height * 3;
+	pBmp->bmiHeader.biSizeImage = width * height * 3;
 	pDC = p;
 }
 
@@ -70,9 +69,9 @@ bool cameraGuide::getData()
 		m_camera->RetrieveResult(5000, m_ptrGrabResult);
 		if (m_ptrGrabResult->GrabSucceeded())
 		{
-			imageBuffer = (uchar *)m_ptrGrabResult->GetBuffer();
+			capBuffer = (uchar *)m_ptrGrabResult->GetBuffer();
 			for (int i = 0; i < height; i++)
-				memcpy(trackBuffer + i * showWidth, imageBuffer + i * width + 1, showWidth);
+				memcpy(imageBuffer + i * width, capBuffer + i * (width+2) + 1, width);
 		}
 		return true;
 	}
@@ -84,11 +83,49 @@ bool cameraGuide::getData()
 void cameraGuide::show()
 {
 	for (int i = 0; i < height; i++)
-		for(int j=0;j<showWidth;j++)
+		for(int j=0;j<width;j++)
 		{
-			showBuf[i*showWidth * 3 + j * 3 + 0] = imageBuffer[i*width + j + 1];
-			showBuf[i*showWidth * 3 + j * 3 + 1] = imageBuffer[i*width + j + 1];
-			showBuf[i*showWidth * 3 + j * 3 + 2] = imageBuffer[i*width + j + 1];
+			showBuf[i*width * 3 + j * 3 + 0] = imageBuffer[i*width + j];
+			showBuf[i*width * 3 + j * 3 + 1] = imageBuffer[i*width + j];
+			showBuf[i*width * 3 + j * 3 + 2] = imageBuffer[i*width + j];
 		}
-	StretchDIBits(pDC->m_hDC, 0, 16, showWidth*0.225, -height*0.225, 0, 0, showWidth, height, showBuf, pBmp, DIB_RGB_COLORS, SRCCOPY);
+	int margin = 60;
+	int paintX = centerX-1, paintY = centerY-1;
+	if (paintX > 0 && paintX < width && paintY>0 && paintY < height)
+	{
+		for (int bord = 0; bord < 10; bord++)
+		{
+			for (int i = paintY - margin; i < paintY + margin; i++)
+			{
+				if (paintX - margin > 0 && paintX - margin < width && i>0 && i < height)
+				{
+					showBuf[i*width * 3 + (paintX - margin + bord) * 3 + 0] = 0;
+					showBuf[i*width * 3 + (paintX - margin + bord) * 3 + 1] = 0;
+					showBuf[i*width * 3 + (paintX - margin + bord) * 3 + 2] = 255;
+				}
+				if (paintX + margin > 0 && paintX + margin < width && i>0 && i < height)
+				{
+					showBuf[i*width * 3 + (paintX + margin - bord) * 3 + 0] = 0;
+					showBuf[i*width * 3 + (paintX + margin - bord) * 3 + 1] = 0;
+					showBuf[i*width * 3 + (paintX + margin - bord) * 3 + 2] = 255;
+				}
+			}
+			for (int i = paintX - margin; i < paintX + margin; i++)
+			{
+				if (i > 0 && i < width && paintY - margin>0 && paintY - margin < height)
+				{
+					showBuf[(paintY - margin + bord)*width * 3 + i * 3 + 0] = 0;
+					showBuf[(paintY - margin + bord)*width * 3 + i * 3 + 1] = 0;
+					showBuf[(paintY - margin + bord)*width * 3 + i * 3 + 2] = 255;
+				}
+				if (i > 0 && i < width && paintY + margin>0 && paintY + margin < height)
+				{
+					showBuf[(paintY + margin - bord)*width * 3 + i * 3 + 0] = 0;
+					showBuf[(paintY + margin - bord)*width * 3 + i * 3 + 1] = 0;
+					showBuf[(paintY + margin - bord)*width * 3 + i * 3 + 2] = 255;
+				}
+			}
+		}
+	}
+	StretchDIBits(pDC->m_hDC, 0, 16, width*0.225, -height*0.225, 0, 0, width, height, showBuf, pBmp, DIB_RGB_COLORS, SRCCOPY);
 }
